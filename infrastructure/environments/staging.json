@@ -1,0 +1,20 @@
+{
+  "environment": "staging",
+  "description": "Staging environment for testing and development",
+  "config": {
+    "priceClass": "PriceClass_100",
+    "cacheTtl": {
+      "html": 300,
+      "images": 86400,
+      "assets": 2592000
+    },
+    "monitoring": {
+      "enableDetailedMetrics": true,
+      "billingAlarmThreshold": 25
+    },
+    "security": {
+      "enableWaf": true,
+      "rateLimitPerMinute": 1000
+    }
+  }
+}

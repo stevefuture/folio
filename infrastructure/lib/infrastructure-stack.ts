@@ -26,6 +26,22 @@ export class InfrastructureStack extends cdk.Stack {
       deletionProtection: true
     });
 
+    // GSI1: Status and Date Index
+    this.table.addGlobalSecondaryIndex({
+      indexName: 'GSI1',
+      partitionKey: { name: 'GSI1PK', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'GSI1SK', type: dynamodb.AttributeType.STRING },
+      projectionType: dynamodb.ProjectionType.ALL
+    });
+
+    // GSI2: Category and Feature Index
+    this.table.addGlobalSecondaryIndex({
+      indexName: 'GSI2',
+      partitionKey: { name: 'GSI2PK', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'GSI2SK', type: dynamodb.AttributeType.STRING },
+      projectionType: dynamodb.ProjectionType.ALL
+    });
+
     // S3 bucket for images with lifecycle policy
     this.bucket = new s3.Bucket(this, 'PortfolioBucket', {
       versioned: true,

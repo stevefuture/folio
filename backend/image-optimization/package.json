@@ -1,0 +1,16 @@
+{
+  "name": "image-optimization-lambda",
+  "version": "1.0.0",
+  "description": "AWS Lambda function for on-demand image optimization",
+  "main": "index.js",
+  "scripts": {
+    "install": "npm install --production"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1490.0",
+    "sharp": "^0.32.6"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

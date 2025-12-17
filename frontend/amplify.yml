@@ -1,0 +1,70 @@
+version: 1
+applications:
+  - appRoot: frontend
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - echo "Installing dependencies..."
+            - npm ci
+            - echo "Environment: $AWS_BRANCH"
+            - |
+              if [ "$AWS_BRANCH" = "main" ]; then
+                echo "Production build"
+                cp .env.production .env.local
+              elif [ "$AWS_BRANCH" = "staging" ]; then
+                echo "Staging build"
+                cp .env.staging .env.local
+              else
+                echo "Development build"
+                cp .env.development .env.local
+              fi
+        build:
+          commands:
+            - echo "Building Next.js application..."
+            - export DEPLOYMENT_TARGET=amplify
+            - npm run build
+        postBuild:
+          commands:
+            - echo "Build completed successfully"
+            - echo "Generating sitemap..."
+            - npm run postbuild || true
+      artifacts:
+        baseDirectory: .next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
+          - .next/cache/**/*
+    customHeaders:
+      - pattern: '**/*'
+        headers:
+          - key: 'Strict-Transport-Security'
+            value: 'max-age=31536000; includeSubDomains; preload'
+          - key: 'X-Content-Type-Options'
+            value: 'nosniff'
+          - key: 'X-Frame-Options'
+            value: 'DENY'
+          - key: 'Referrer-Policy'
+            value: 'strict-origin-when-cross-origin'
+      - pattern: '*.js'
+        headers:
+          - key: 'Cache-Control'
+            value: 'public, max-age=31536000, immutable'
+      - pattern: '*.css'
+        headers:
+          - key: 'Cache-Control'
+            value: 'public, max-age=31536000, immutable'
+      - pattern: '*.png'
+        headers:
+          - key: 'Cache-Control'
+            value: 'public, max-age=31536000, immutable'
+      - pattern: '*.jpg'
+        headers:
+          - key: 'Cache-Control'
+            value: 'public, max-age=31536000, immutable'
+      - pattern: '*.webp'
+        headers:
+          - key: 'Cache-Control'
+            value: 'public, max-age=31536000, immutable'

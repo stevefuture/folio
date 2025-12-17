@@ -1,0 +1,16 @@
+{
+  "name": "portfolio-api",
+  "version": "1.0.0",
+  "description": "Photography portfolio API with DynamoDB backend",
+  "main": "index.js",
+  "scripts": {
+    "install": "npm install --production"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1490.0",
+    "uuid": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
