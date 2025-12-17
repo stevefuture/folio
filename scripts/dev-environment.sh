@@ -40,7 +40,7 @@ start_dev() {
     log_info "🚀 Starting dev environment for $DOMAIN"
     
     # Deploy minimal dev stack
-    cd ../infrastructure
+    cd "$(dirname "$0")/../infrastructure"
     
     log_info "Deploying dev infrastructure..."
     if [ -n "$HOSTED_ZONE_ID" ]; then
@@ -110,7 +110,7 @@ stop_dev() {
     fi
     
     # Delete stacks in reverse dependency order
-    cd ../infrastructure
+    cd "$(dirname "$0")/../infrastructure"
     
     log_info "Deleting CloudFormation stacks..."
     for STACK in $DEV_STACKS; do

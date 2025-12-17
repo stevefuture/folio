@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+require("source-map-support/register");
+const cdk = require("aws-cdk-lib");
+const simple_dev_stack_1 = require("../lib/simple-dev-stack");
+const app = new cdk.App();
+const domain = app.node.tryGetContext('domain');
+const hostedZoneId = app.node.tryGetContext('hostedZoneId');
+new simple_dev_stack_1.SimpleDevStack(app, 'PortfolioDevStack', {
+    domain,
+    hostedZoneId,
+    env: {
+        account: process.env.CDK_DEFAULT_ACCOUNT,
+        region: process.env.CDK_DEFAULT_REGION,
+    },
+    tags: {
+        Project: 'PhotographyPortfolio',
+        Environment: 'dev'
+    }
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZGV2LWFwcC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImRldi1hcHAudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7O0FBQ0EsdUNBQXFDO0FBQ3JDLG1DQUFtQztBQUNuQyw4REFBeUQ7QUFFekQsTUFBTSxHQUFHLEdBQUcsSUFBSSxHQUFHLENBQUMsR0FBRyxFQUFFLENBQUM7QUFFMUIsTUFBTSxNQUFNLEdBQUcsR0FBRyxDQUFDLElBQUksQ0FBQyxhQUFhLENBQUMsUUFBUSxDQUFDLENBQUM7QUFDaEQsTUFBTSxZQUFZLEdBQUcsR0FBRyxDQUFDLElBQUksQ0FBQyxhQUFhLENBQUMsY0FBYyxDQUFDLENBQUM7QUFFNUQsSUFBSSxpQ0FBYyxDQUFDLEdBQUcsRUFBRSxtQkFBbUIsRUFBRTtJQUMzQyxNQUFNO0lBQ04sWUFBWTtJQUNaLEdBQUcsRUFBRTtRQUNILE9BQU8sRUFBRSxPQUFPLENBQUMsR0FBRyxDQUFDLG1CQUFtQjtRQUN4QyxNQUFNLEVBQUUsT0FBTyxDQUFDLEdBQUcsQ0FBQyxrQkFBa0I7S0FDdkM7SUFDRCxJQUFJLEVBQUU7UUFDSixPQUFPLEVBQUUsc0JBQXNCO1FBQy9CLFdBQVcsRUFBRSxLQUFLO0tBQ25CO0NBQ0YsQ0FBQyxDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiIyEvdXNyL2Jpbi9lbnYgbm9kZVxuaW1wb3J0ICdzb3VyY2UtbWFwLXN1cHBvcnQvcmVnaXN0ZXInO1xuaW1wb3J0ICogYXMgY2RrIGZyb20gJ2F3cy1jZGstbGliJztcbmltcG9ydCB7IFNpbXBsZURldlN0YWNrIH0gZnJvbSAnLi4vbGliL3NpbXBsZS1kZXYtc3RhY2snO1xuXG5jb25zdCBhcHAgPSBuZXcgY2RrLkFwcCgpO1xuXG5jb25zdCBkb21haW4gPSBhcHAubm9kZS50cnlHZXRDb250ZXh0KCdkb21haW4nKTtcbmNvbnN0IGhvc3RlZFpvbmVJZCA9IGFwcC5ub2RlLnRyeUdldENvbnRleHQoJ2hvc3RlZFpvbmVJZCcpO1xuXG5uZXcgU2ltcGxlRGV2U3RhY2soYXBwLCAnUG9ydGZvbGlvRGV2U3RhY2snLCB7XG4gIGRvbWFpbixcbiAgaG9zdGVkWm9uZUlkLFxuICBlbnY6IHtcbiAgICBhY2NvdW50OiBwcm9jZXNzLmVudi5DREtfREVGQVVMVF9BQ0NPVU5ULFxuICAgIHJlZ2lvbjogcHJvY2Vzcy5lbnYuQ0RLX0RFRkFVTFRfUkVHSU9OLFxuICB9LFxuICB0YWdzOiB7XG4gICAgUHJvamVjdDogJ1Bob3RvZ3JhcGh5UG9ydGZvbGlvJyxcbiAgICBFbnZpcm9ubWVudDogJ2RldidcbiAgfVxufSk7XG4iXX0=

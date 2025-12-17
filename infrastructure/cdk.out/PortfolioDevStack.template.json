@@ -1,0 +1,982 @@
+{
+ "Resources": {
+  "DevBucketEF6BB726": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketName": {
+     "Fn::Join": [
+      "",
+      [
+       "portfolio-dev-",
+       {
+        "Ref": "AWS::AccountId"
+       }
+      ]
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "Tags": [
+     {
+      "Key": "aws-cdk:auto-delete-objects",
+      "Value": "true"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevBucket/Resource"
+   }
+  },
+  "DevBucketPolicy81006852": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "DevBucketEF6BB726"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:PutBucketPolicy"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+          "Arn"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "DevBucketEF6BB726",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "DevBucketEF6BB726",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": "s3:GetObject",
+       "Effect": "Allow",
+       "Principal": {
+        "CanonicalUser": {
+         "Fn::GetAtt": [
+          "DevDistributionOrigin1S3Origin5FB860BB",
+          "S3CanonicalUserId"
+         ]
+        }
+       },
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::GetAtt": [
+            "DevBucketEF6BB726",
+            "Arn"
+           ]
+          },
+          "/*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevBucket/Policy/Resource"
+   }
+  },
+  "DevBucketAutoDeleteObjectsCustomResource893E9AF3": {
+   "Type": "Custom::S3AutoDeleteObjects",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+      "Arn"
+     ]
+    },
+    "BucketName": {
+     "Ref": "DevBucketEF6BB726"
+    }
+   },
+   "DependsOn": [
+    "DevBucketPolicy81006852"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevBucket/AutoDeleteObjectsCustomResource/Default"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-652660073044-ap-southeast-2",
+     "S3Key": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Description": {
+     "Fn::Join": [
+      "",
+      [
+       "Lambda function for auto-deleting objects in ",
+       {
+        "Ref": "DevBucketEF6BB726"
+       },
+       " S3 bucket."
+      ]
+     ]
+    }
+   },
+   "DependsOn": [
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+    "aws:asset:property": "Code"
+   }
+  },
+  "DevTableFE62B8D0": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "PK",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "SK",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "PK",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "SK",
+      "KeyType": "RANGE"
+     }
+    ],
+    "TableName": "PortfolioData-dev"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevTable/Resource"
+   }
+  },
+  "DevFunctionServiceRoleDB76C292": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevFunction/ServiceRole/Resource"
+   }
+  },
+  "DevFunctionServiceRoleDefaultPolicy25271DFD": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "DevTableFE62B8D0",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "s3:Abort*",
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "DevBucketEF6BB726",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "DevBucketEF6BB726",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "DevFunctionServiceRoleDefaultPolicy25271DFD",
+    "Roles": [
+     {
+      "Ref": "DevFunctionServiceRoleDB76C292"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "DevFunctionAEF03454": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ZipFile": "\n        exports.handler = async (event) => {\n          return {\n            statusCode: 200,\n            headers: {\n              'Content-Type': 'application/json',\n              'Access-Control-Allow-Origin': '*'\n            },\n            body: JSON.stringify({\n              message: 'Dev API is working!',\n              timestamp: new Date().toISOString(),\n              environment: 'dev'\n            })\n          };\n        };\n      "
+    },
+    "Environment": {
+     "Variables": {
+      "TABLE_NAME": {
+       "Ref": "DevTableFE62B8D0"
+      },
+      "BUCKET_NAME": {
+       "Ref": "DevBucketEF6BB726"
+      }
+     }
+    },
+    "FunctionName": "portfolio-api-dev",
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "DevFunctionServiceRoleDB76C292",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs18.x"
+   },
+   "DependsOn": [
+    "DevFunctionServiceRoleDefaultPolicy25271DFD",
+    "DevFunctionServiceRoleDB76C292"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevFunction/Resource"
+   }
+  },
+  "DevApiB5AC83C1": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Name": "portfolio-dev-api"
+   },
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevApi/Resource"
+   }
+  },
+  "DevApiCloudWatchRole827A020D": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "apigateway.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+       ]
+      ]
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevApi/CloudWatchRole/Resource"
+   }
+  },
+  "DevApiAccount5513743B": {
+   "Type": "AWS::ApiGateway::Account",
+   "Properties": {
+    "CloudWatchRoleArn": {
+     "Fn::GetAtt": [
+      "DevApiCloudWatchRole827A020D",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "DevApiB5AC83C1"
+   ],
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevApi/Account"
+   }
+  },
+  "DevApiDeploymentED3F0099b6bcfa47ad3a3892535bd79cc4664d27": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "Automatically created by the RestApi construct",
+    "RestApiId": {
+     "Ref": "DevApiB5AC83C1"
+    }
+   },
+   "DependsOn": [
+    "DevApiproxyANY912A6F90",
+    "DevApiproxy5B89081E",
+    "DevApiANY0CAA4B22",
+    "DevApiGET8A77B0C3"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevApi/Deployment/Resource",
+    "aws:cdk:do-not-refactor": true
+   }
+  },
+  "DevApiDeploymentStagedevC9433128": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "DevApiDeploymentED3F0099b6bcfa47ad3a3892535bd79cc4664d27"
+    },
+    "RestApiId": {
+     "Ref": "DevApiB5AC83C1"
+    },
+    "StageName": "dev"
+   },
+   "DependsOn": [
+    "DevApiAccount5513743B"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevApi/DeploymentStage.dev/Resource"
+   }
+  },
+  "DevApiGETApiPermissionPortfolioDevStackDevApiE01EE295GET0EFCD372": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "DevFunctionAEF03454",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:652660073044:",
+       {
+        "Ref": "DevApiB5AC83C1"
+       },
+       "/",
+       {
+        "Ref": "DevApiDeploymentStagedevC9433128"
+       },
+       "/GET/"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevApi/Default/GET/ApiPermission.PortfolioDevStackDevApiE01EE295.GET.."
+   }
+  },
+  "DevApiGETApiPermissionTestPortfolioDevStackDevApiE01EE295GETE49F6CEF": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "DevFunctionAEF03454",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:652660073044:",
+       {
+        "Ref": "DevApiB5AC83C1"
+       },
+       "/test-invoke-stage/GET/"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevApi/Default/GET/ApiPermission.Test.PortfolioDevStackDevApiE01EE295.GET.."
+   }
+  },
+  "DevApiGET8A77B0C3": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "DevFunctionAEF03454",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "DevApiB5AC83C1",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "DevApiB5AC83C1"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevApi/Default/GET/Resource"
+   }
+  },
+  "DevApiproxy5B89081E": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "DevApiB5AC83C1",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "{proxy+}",
+    "RestApiId": {
+     "Ref": "DevApiB5AC83C1"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevApi/Default/{proxy+}/Resource"
+   }
+  },
+  "DevApiproxyANYApiPermissionPortfolioDevStackDevApiE01EE295ANYproxy33E14231": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "DevFunctionAEF03454",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:652660073044:",
+       {
+        "Ref": "DevApiB5AC83C1"
+       },
+       "/",
+       {
+        "Ref": "DevApiDeploymentStagedevC9433128"
+       },
+       "/*/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevApi/Default/{proxy+}/ANY/ApiPermission.PortfolioDevStackDevApiE01EE295.ANY..{proxy+}"
+   }
+  },
+  "DevApiproxyANYApiPermissionTestPortfolioDevStackDevApiE01EE295ANYproxy8A76AF1B": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "DevFunctionAEF03454",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:652660073044:",
+       {
+        "Ref": "DevApiB5AC83C1"
+       },
+       "/test-invoke-stage/*/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevApi/Default/{proxy+}/ANY/ApiPermission.Test.PortfolioDevStackDevApiE01EE295.ANY..{proxy+}"
+   }
+  },
+  "DevApiproxyANY912A6F90": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "ANY",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "DevFunctionAEF03454",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "DevApiproxy5B89081E"
+    },
+    "RestApiId": {
+     "Ref": "DevApiB5AC83C1"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevApi/Default/{proxy+}/ANY/Resource"
+   }
+  },
+  "DevApiANY0CAA4B22": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "ANY",
+    "Integration": {
+     "Type": "MOCK"
+    },
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "DevApiB5AC83C1",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "DevApiB5AC83C1"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevApi/Default/ANY/Resource"
+   }
+  },
+  "DevDistributionOrigin1S3Origin5FB860BB": {
+   "Type": "AWS::CloudFront::CloudFrontOriginAccessIdentity",
+   "Properties": {
+    "CloudFrontOriginAccessIdentityConfig": {
+     "Comment": "Identity for PortfolioDevStackDevDistributionOrigin1CA3A30C0"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevDistribution/Origin1/S3Origin/Resource"
+   }
+  },
+  "DevDistributionCAE846BC": {
+   "Type": "AWS::CloudFront::Distribution",
+   "Properties": {
+    "DistributionConfig": {
+     "CacheBehaviors": [
+      {
+       "AllowedMethods": [
+        "GET",
+        "HEAD",
+        "OPTIONS",
+        "PUT",
+        "PATCH",
+        "POST",
+        "DELETE"
+       ],
+       "CachePolicyId": "4135ea2d-6df8-44a3-9df3-4b5a84be39ad",
+       "Compress": true,
+       "PathPattern": "/api/*",
+       "TargetOriginId": "PortfolioDevStackDevDistributionOrigin2F0007BE3",
+       "ViewerProtocolPolicy": "https-only"
+      }
+     ],
+     "Comment": "Dev Portfolio Distribution",
+     "DefaultCacheBehavior": {
+      "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+      "Compress": true,
+      "TargetOriginId": "PortfolioDevStackDevDistributionOrigin1CA3A30C0",
+      "ViewerProtocolPolicy": "redirect-to-https"
+     },
+     "Enabled": true,
+     "HttpVersion": "http2",
+     "IPV6Enabled": true,
+     "Origins": [
+      {
+       "DomainName": {
+        "Fn::GetAtt": [
+         "DevBucketEF6BB726",
+         "RegionalDomainName"
+        ]
+       },
+       "Id": "PortfolioDevStackDevDistributionOrigin1CA3A30C0",
+       "S3OriginConfig": {
+        "OriginAccessIdentity": {
+         "Fn::Join": [
+          "",
+          [
+           "origin-access-identity/cloudfront/",
+           {
+            "Ref": "DevDistributionOrigin1S3Origin5FB860BB"
+           }
+          ]
+         ]
+        }
+       }
+      },
+      {
+       "CustomOriginConfig": {
+        "OriginProtocolPolicy": "https-only",
+        "OriginSSLProtocols": [
+         "TLSv1.2"
+        ]
+       },
+       "DomainName": {
+        "Fn::Select": [
+         2,
+         {
+          "Fn::Split": [
+           "/",
+           {
+            "Fn::Join": [
+             "",
+             [
+              "https://",
+              {
+               "Ref": "DevApiB5AC83C1"
+              },
+              ".execute-api.ap-southeast-2.",
+              {
+               "Ref": "AWS::URLSuffix"
+              },
+              "/",
+              {
+               "Ref": "DevApiDeploymentStagedevC9433128"
+              },
+              "/"
+             ]
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "Id": "PortfolioDevStackDevDistributionOrigin2F0007BE3",
+       "OriginPath": {
+        "Fn::Join": [
+         "",
+         [
+          "/",
+          {
+           "Fn::Select": [
+            3,
+            {
+             "Fn::Split": [
+              "/",
+              {
+               "Fn::Join": [
+                "",
+                [
+                 "https://",
+                 {
+                  "Ref": "DevApiB5AC83C1"
+                 },
+                 ".execute-api.ap-southeast-2.",
+                 {
+                  "Ref": "AWS::URLSuffix"
+                 },
+                 "/",
+                 {
+                  "Ref": "DevApiDeploymentStagedevC9433128"
+                 },
+                 "/"
+                ]
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        ]
+       }
+      }
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/DevDistribution/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/3VQy27DIBD8ltwJVZwees1DkXqoEqW9Vxg27sYGLBaSWhb/XowTxara087uzuwwFLxYFryYiSvNparnDZa8f/dC1iyNPnta8n4dZA2ebU7mhsZysA3K7jEe+8hUZ4S2Kt35EGUDAyGDyBqhSyV4vwtGerRmWE3xAZxGotRFhkLz/mhHfa4Pv7uTaLESHq6iS1Qgv2oxsx9wJaUNxrMttI3tNJgcY9KlqFW2GEGS2uAkrAUBewP/ZdWwvKGDs9/dnXJzyjgy2digTs4az/stkndYhhxr77DC4R1A9KqSJfqcYTMIdoPgP8b0TIxsE8hb/Zf7r1V65QUVuJxhRQR+yIamYlPxPvg2+MiMVcDP9HRZvPDFM1/MzoQ4d+nTUAM/jvUHI/TRKSYCAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "PortfolioDevStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "DevApiEndpoint15A80CF4": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "DevApiB5AC83C1"
+      },
+      ".execute-api.ap-southeast-2.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "DevApiDeploymentStagedevC9433128"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "BucketName": {
+   "Value": {
+    "Ref": "DevBucketEF6BB726"
+   }
+  },
+  "TableName": {
+   "Value": {
+    "Ref": "DevTableFE62B8D0"
+   }
+  },
+  "ApiUrl": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "DevApiB5AC83C1"
+      },
+      ".execute-api.ap-southeast-2.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "DevApiDeploymentStagedevC9433128"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "DistributionUrl": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Fn::GetAtt": [
+        "DevDistributionCAE846BC",
+        "DomainName"
+       ]
+      }
+     ]
+    ]
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

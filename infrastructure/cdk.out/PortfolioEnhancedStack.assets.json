@@ -1,0 +1,36 @@
+{
+  "version": "48.0.0",
+  "files": {
+    "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6": {
+      "displayName": "PortfolioEnhancedStack/Custom::S3AutoDeleteObjectsCustomResourceProvider Code",
+      "source": {
+        "path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "652660073044-ap-southeast-2-e120a741": {
+          "bucketName": "cdk-hnb659fds-assets-652660073044-ap-southeast-2",
+          "objectKey": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip",
+          "region": "ap-southeast-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::652660073044:role/cdk-hnb659fds-file-publishing-role-652660073044-ap-southeast-2"
+        }
+      }
+    },
+    "2510b2e4c36ae5f118b6d8bbd883c0cfd448180eecfe548ca7594c72b28acff9": {
+      "displayName": "PortfolioEnhancedStack Template",
+      "source": {
+        "path": "PortfolioEnhancedStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "652660073044-ap-southeast-2-0c9d0dfa": {
+          "bucketName": "cdk-hnb659fds-assets-652660073044-ap-southeast-2",
+          "objectKey": "2510b2e4c36ae5f118b6d8bbd883c0cfd448180eecfe548ca7594c72b28acff9.json",
+          "region": "ap-southeast-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::652660073044:role/cdk-hnb659fds-file-publishing-role-652660073044-ap-southeast-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

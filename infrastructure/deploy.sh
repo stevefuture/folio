@@ -24,8 +24,8 @@ echo "📊 Environment: $ENVIRONMENT"
 echo "🎯 Phase: ${PHASE#--}"
 
 # Validate environment
-if [[ ! "$ENVIRONMENT" =~ ^(staging|production)$ ]]; then
-    echo "❌ Invalid environment. Use 'staging' or 'production'"
+if [[ ! "$ENVIRONMENT" =~ ^(dev|staging|production)$ ]]; then
+    echo "❌ Invalid environment. Use 'dev', 'staging' or 'production'"
     exit 1
 fi
 
